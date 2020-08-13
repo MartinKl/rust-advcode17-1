@@ -1,60 +1,56 @@
+use std::env;
+
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn test_1122() {
         let seq = "1122";
-        assert_eq!(3, run(&seq));
+        assert_eq!(3, check(&seq));
     }
 
     #[test]
     fn test_1111() {
         let seq = "1111";
-        assert_eq!(4, run(&seq));
+        assert_eq!(4, check(&seq));
     }
 
     #[test]
     fn test_1234() {
         let seq = "1234";
-        assert_eq!(0, run(&seq));
+        assert_eq!(0, check(&seq));
     }
 
     #[test]
     fn test_91212129() {
         let seq = "91212129";
-        assert_eq!(9, run(&seq));
+        assert_eq!(9, check(&seq));
     }
 }
 
-fn run(sequence: &str) -> u32 {
-    let mut digits = sequence.chars();
+const BASE: u32 = 10;
+
+
+fn check(sequence: &str) -> u32 {
     let mut s: u32 = 0;
-    let mut c: char = match digits.next() {
-        Some(ch) => ch,
-        _ => panic!("Unexpected!")
-    };
-    for d in digits {
-        s += match d == c {
-            true => match d.to_digit(10) {
-                None => panic!("I didn't see that coming!"),
-                Some(u) => u
-            },
-            false => 0
-        };
-        c = d;
-    }
-    s += match sequence.chars().nth(0) {
-        Some(cc) => match cc == c { 
-            true => match c.to_digit(10) {
+    let chars: Vec<_> = sequence.chars().collect();
+    let chars_ = [&chars[1..chars.len()], &chars[0..1]].concat();
+    for i in 0..chars.len() {
+        s += match chars[i] == chars_[i] {
+            false => 0,
+            true => match chars[i].to_digit(BASE) {
                 Some(u) => u,
-                None => panic!("AH!")
-            },
-            false => 0 
-        },
-        None => panic!("...")
-    };
+                None => panic!("{:?} not a number of base {}", chars[i], BASE)
+            }
+        }
+    } 
     s
 }
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    for arg in &args[1..] {
+        let v = check(arg.as_str());
+        println!("{} has checksum {}", &arg, &v);
+    }
 }

@@ -31,30 +31,45 @@ fn run(sequence: &str) -> u32 {
     let mut s: u32 = 0;
     let mut c: char = match digits.next() {
         Some(ch) => ch,
-        _ => panic!("Unexpected!")
+        _ => panic!("Unexpected!"),
     };
     for d in digits {
         s += match d == c {
             true => match d.to_digit(10) {
                 None => panic!("I didn't see that coming!"),
-                Some(u) => u
+                Some(u) => u,
             },
-            false => 0
+            false => 0,
         };
         c = d;
     }
     s += match sequence.chars().nth(0) {
-        Some(cc) => match cc == c { 
+        Some(cc) => match cc == c {
             true => match c.to_digit(10) {
                 Some(u) => u,
-                None => panic!("AH!")
+                None => panic!("AH!"),
             },
-            false => 0 
+            false => 0,
         },
-        None => panic!("...")
+        None => panic!("..."),
     };
     s
 }
 
 fn main() {
+    println!("{}", run_iter(&String::from("1122")));
+}
+
+/// An attempt to solve the same puzzle with just iterators.
+fn run_iter(seq: &str) -> u32 {
+    seq.chars()
+        .zip(seq.chars().cycle().skip(1))
+        .filter_map(|pair: (char, char)| -> Option<u32> {
+            let (c1, c2) = pair;
+            match c1 == c2 {
+                true => c2.to_digit(10),
+                false => None,
+            }
+        })
+        .sum()
 }

@@ -54,3 +54,17 @@ fn main() {
         println!("{} has checksum {}", &arg, &v);
     }
 }
+
+/// An attempt to solve the same puzzle with just iterators.
+fn run_iter(seq: &str) -> u32 {
+    seq.chars()
+        .zip(seq.chars().cycle().skip(1))
+        .filter_map(|pair: (char, char)| -> Option<u32> {
+            let (c1, c2) = pair;
+            match c1 == c2 {
+                true => c2.to_digit(10),
+                false => None,
+            }
+        })
+        .sum()
+}
